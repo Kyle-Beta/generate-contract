@@ -18,7 +18,6 @@ a = Analysis(
     hooksconfig={},
     runtime_hooks=[],
     excludes=[
-        "flet.auth",
         "flet.fastapi",
         "flet.pyodide_connection",
         "flet.security",

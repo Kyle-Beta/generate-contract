@@ -1,5 +1,5 @@
 #define MyAppName "合同批量生成器"
-#define MyAppVersion "1.1.8"
+#define MyAppVersion "1.1.9"
 #define MyAppPublisher "KaiHuang"
 #define MyAppExeName "合同批量生成器.exe"
 
