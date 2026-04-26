@@ -29,7 +29,7 @@ call .venv_build\Scripts\activate.bat
 :: ── 安装依赖 ──────────────────────────────────
 echo [INFO] 安装依赖（首次较慢）...
 python -m pip install --quiet --upgrade pip
-python -m pip install --quiet openpyxl python-docx xlrd pyinstaller
+python -m pip install --quiet -r requirements.txt pyinstaller
 if errorlevel 1 ( echo [错误] 依赖安装失败 & pause & exit /b 1 )
 
 :: ── 下载 UPX（可选，用于压缩体积）───────────────

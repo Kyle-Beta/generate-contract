@@ -1,17 +1,20 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 from pathlib import Path
+from PyInstaller.utils.hooks import collect_all
 
 project_dir = Path.cwd()
 icon_file = project_dir / "app.ico"
 version_file = project_dir / "version_info.txt"
+flet_datas, flet_binaries, flet_hiddenimports = collect_all("flet")
+desktop_datas, desktop_binaries, desktop_hiddenimports = collect_all("flet_desktop")
 
 a = Analysis(
     ['main.py'],
     pathex=[],
-    binaries=[],
-    datas=[],
-    hiddenimports=[],
+    binaries=flet_binaries + desktop_binaries,
+    datas=flet_datas + desktop_datas,
+    hiddenimports=flet_hiddenimports + desktop_hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

@@ -2,18 +2,21 @@
 
 import os
 from pathlib import Path
+from PyInstaller.utils.hooks import collect_all
 
 project_dir = Path.cwd()
 icon_file = project_dir / "app.icns"
 bundle_version = (project_dir / "VERSION").read_text(encoding="utf-8").strip()
 target_arch = os.environ.get("MACOS_TARGET_ARCH") or None
+flet_datas, flet_binaries, flet_hiddenimports = collect_all("flet")
+desktop_datas, desktop_binaries, desktop_hiddenimports = collect_all("flet_desktop")
 
 a = Analysis(
     ['main.py'],
     pathex=[],
-    binaries=[],
-    datas=[],
-    hiddenimports=[],
+    binaries=flet_binaries + desktop_binaries,
+    datas=flet_datas + desktop_datas,
+    hiddenimports=flet_hiddenimports + desktop_hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
