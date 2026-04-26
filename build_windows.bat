@@ -4,7 +4,7 @@ setlocal enabledelayedexpansion
 
 echo ============================================
 echo  合同批量生成器 Windows 打包脚本
-echo  生成图形界面 .exe，目标机器无需安装 Python
+echo  生成当前 Flet 桌面版 .exe，目标机器无需安装 Python
 echo ============================================
 echo.
 
@@ -81,7 +81,7 @@ echo.
 echo 程序说明：
 echo   1. 双击打开 dist\合同批量生成器.exe
 echo   2. 选择 Excel 数据源、Word 模板和输出目录
-echo   3. 如需按字段命名文件，可填写“文件名字段”后点击开始生成
+echo   3. 选择或确认“文件名字段”后点击开始生成
 echo   4. 如需自定义图标，请在项目根目录放置 app.ico 后重新打包
 echo.
 

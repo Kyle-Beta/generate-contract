@@ -1,3 +1,4 @@
 openpyxl>=3.1.0
 python-docx>=1.1.0
 xlrd>=2.0.1  # 读取旧版 .xls 文件（可选）
+flet>=0.27.0

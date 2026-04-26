@@ -7,7 +7,7 @@ icon_file = project_dir / "app.ico"
 version_file = project_dir / "version_info.txt"
 
 a = Analysis(
-    ['generate_contracts_gui.py'],
+    ['main.py'],
     pathex=[],
     binaries=[],
     datas=[],

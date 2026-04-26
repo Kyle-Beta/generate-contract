@@ -16,7 +16,7 @@
 
 - 用示例 Excel 和模板实际生成一次合同
 - 验证重复文件名时不会覆盖已有文件
-- 验证“读取字段”能正确显示占位符
+- 验证选择 Excel 后能自动刷新“文件名字段”下拉内容
 - 验证生成后的正文、表格、页眉、页脚都能替换
 
 ## 打包验证
@@ -39,7 +39,7 @@
 ## GitHub 发布
 
 - 提交代码并推送到仓库默认分支
-- 推送 tag，例如 `v1.1.0`
+- 推送 tag，例如 `v1.1.4`
 - 检查 GitHub Actions 中 `build-windows.yml` 和 `release.yml` 是否执行成功
 - 检查 GitHub Release 页面是否附带以下文件：
 - `contract-generator.exe`

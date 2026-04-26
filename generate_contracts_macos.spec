@@ -9,7 +9,7 @@ bundle_version = (project_dir / "VERSION").read_text(encoding="utf-8").strip()
 target_arch = os.environ.get("MACOS_TARGET_ARCH") or None
 
 a = Analysis(
-    ['generate_contracts_gui.py'],
+    ['main.py'],
     pathex=[],
     binaries=[],
     datas=[],
