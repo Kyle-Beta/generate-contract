@@ -146,7 +146,7 @@ VERSION
 
 触发方式：
 
-- 推送 tag，例如 `v1.1.7`
+- 推送 tag，例如 `v1.1.8`
 - 在 GitHub Actions 页面手动运行
 
 执行后会自动创建 GitHub Release，并附带以下文件：

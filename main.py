@@ -668,9 +668,12 @@ def main(page: ft.Page):
 
     page.on_resized = on_window_resize
 
-    c.excel_picker = ft.FilePicker(on_result=_on_excel_picked)
-    c.template_picker = ft.FilePicker(on_result=_on_template_picked)
-    c.output_picker = ft.FilePicker(on_result=_on_output_picked)
+    c.excel_picker = ft.FilePicker()
+    c.excel_picker.on_result = _on_excel_picked
+    c.template_picker = ft.FilePicker()
+    c.template_picker.on_result = _on_template_picked
+    c.output_picker = ft.FilePicker()
+    c.output_picker.on_result = _on_output_picked
     page.overlay.extend([c.excel_picker, c.template_picker, c.output_picker])
 
     left = ft.Container(build_config_card(page), col={"xs": 12, "md": 4})
