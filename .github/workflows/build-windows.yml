@@ -1,0 +1,77 @@
+name: Build Windows App
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller
+
+      - name: Build executable
+        shell: pwsh
+        run: |
+          pyinstaller generate_contracts.spec --noconfirm
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: |
+          choco install innosetup --no-progress -y
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "installer.iss"
+
+      - name: Prepare release package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path release | Out-Null
+          Copy-Item "dist\合同批量生成器.exe" "release\合同批量生成器.exe"
+          if (Test-Path "README_windows.md") {
+            Copy-Item "README_windows.md" "release\README_windows.md"
+          }
+          if (Test-Path "sample_data.xlsx") {
+            Copy-Item "sample_data.xlsx" "release\sample_data.xlsx"
+          }
+          if (Test-Path "contract_template.docx") {
+            Copy-Item "contract_template.docx" "release\contract_template.docx"
+          }
+          Compress-Archive -Path "release\*" -DestinationPath "dist\合同批量生成器_windows.zip" -Force
+
+      - name: Upload exe artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-generator-exe
+          path: dist/合同批量生成器.exe
+
+      - name: Upload zip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-generator-windows-package
+          path: dist/合同批量生成器_windows.zip
+
+      - name: Upload installer artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-generator-installer
+          path: dist/合同批量生成器_Setup.exe

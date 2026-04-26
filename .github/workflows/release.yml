@@ -1,0 +1,84 @@
+name: Release Windows App
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  release-windows:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Resolve version
+        id: version
+        shell: pwsh
+        run: |
+          if ($env:GITHUB_REF -like 'refs/tags/*') {
+            $version = $env:GITHUB_REF_NAME.TrimStart('v')
+            $tag = $env:GITHUB_REF_NAME
+          } else {
+            $version = (Get-Content VERSION -Raw).Trim()
+            $tag = "v$version"
+          }
+          "version=$version" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller
+
+      - name: Build executable
+        shell: pwsh
+        run: |
+          pyinstaller generate_contracts.spec --noconfirm
+
+      - name: Install Inno Setup
+        shell: pwsh
+        run: |
+          choco install innosetup --no-progress -y
+
+      - name: Build installer
+        shell: pwsh
+        run: |
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "installer.iss"
+
+      - name: Prepare release package
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path release | Out-Null
+          Copy-Item "dist\合同批量生成器.exe" "release\合同批量生成器.exe"
+          if (Test-Path "README_windows.md") {
+            Copy-Item "README_windows.md" "release\README_windows.md"
+          }
+          if (Test-Path "sample_data.xlsx") {
+            Copy-Item "sample_data.xlsx" "release\sample_data.xlsx"
+          }
+          if (Test-Path "contract_template.docx") {
+            Copy-Item "contract_template.docx" "release\contract_template.docx"
+          }
+          Compress-Archive -Path "release\*" -DestinationPath "dist\合同批量生成器_windows.zip" -Force
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: 合同批量生成器 ${{ steps.version.outputs.version }}
+          generate_release_notes: true
+          files: |
+            dist/合同批量生成器.exe
+            dist/合同批量生成器_windows.zip
+            dist/合同批量生成器_Setup.exe

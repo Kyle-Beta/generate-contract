@@ -1,0 +1,46 @@
+# macOS
+.DS_Store
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pycache_local/
+
+# Virtual environments
+.venv/
+.venv_build/
+venv/
+env/
+myenv/
+
+# Build outputs
+build/
+dist/
+release/
+*.spec.bak
+
+# PyInstaller / packaging temp files
+*.pkg
+*.toc
+*.manifest
+warn-*.txt
+xref-*.html
+
+# Local generated documents
+output_contracts/
+
+# Office temporary files
+~$*.xlsx
+~$*.xls
+~$*.docx
+
+# IDE
+.idea/
+.vscode/
+
+# Windows tools cache
+tools/
