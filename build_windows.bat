@@ -4,7 +4,7 @@ setlocal enabledelayedexpansion
 
 echo ============================================
 echo  合同批量生成器 Windows 打包脚本
-echo  生成当前 Flet 桌面版 .exe，目标机器无需安装 Python
+echo  生成当前 Flet 桌面版精简目录包，目标机器无需安装 Python
 echo ============================================
 echo.
 
@@ -49,7 +49,7 @@ if exist "tools\upx.exe" (
 )
 
 :: ── 清理上次构建 ──────────────────────────────
-if exist "dist\合同批量生成器.exe" del /f /q "dist\合同批量生成器.exe"
+if exist "dist\合同批量生成器" rd /s /q "dist\合同批量生成器" 2>nul
 if exist "build" rd /s /q build 2>nul
 
 :: ── 运行 PyInstaller ──────────────────────────
@@ -63,23 +63,23 @@ if errorlevel 1 (
 )
 
 :: ── 检查结果并显示大小 ────────────────────────
-if not exist "dist\合同批量生成器.exe" (
+if not exist "dist\合同批量生成器\合同批量生成器.exe" (
     echo [错误] 未找到输出文件 & pause & exit /b 1
 )
-for %%f in ("dist\合同批量生成器.exe") do set SIZE=%%~zf
+for %%f in ("dist\合同批量生成器\合同批量生成器.exe") do set SIZE=%%~zf
 set /a SIZE_KB=!SIZE! / 1024
 set /a SIZE_MB=!SIZE_KB! / 1024
 
 echo.
 echo ============================================
 echo  打包完成！
-echo  文件：dist\合同批量生成器.exe
-echo  大小：!SIZE_KB! KB (!SIZE_MB! MB)
-echo  说明：双击即可运行，无需命令行
+echo  文件：dist\合同批量生成器\合同批量生成器.exe
+echo  主程序大小：!SIZE_KB! KB (!SIZE_MB! MB)
+echo  说明：发布时建议压缩整个 dist\合同批量生成器 目录
 echo ============================================
 echo.
 echo 程序说明：
-echo   1. 双击打开 dist\合同批量生成器.exe
+echo   1. 双击打开 dist\合同批量生成器\合同批量生成器.exe
 echo   2. 选择 Excel 数据源、Word 模板和输出目录
 echo   3. 选择或确认“文件名字段”后点击开始生成
 echo   4. 如需自定义图标，请在项目根目录放置 app.ico 后重新打包

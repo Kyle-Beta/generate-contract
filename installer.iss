@@ -1,5 +1,5 @@
 #define MyAppName "合同批量生成器"
-#define MyAppVersion "1.1.6"
+#define MyAppVersion "1.1.7"
 #define MyAppPublisher "KaiHuang"
 #define MyAppExeName "合同批量生成器.exe"
 
@@ -32,7 +32,7 @@ Name: "chinesesimp"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "创建桌面快捷方式"; GroupDescription: "附加任务:"; Flags: unchecked
 
 [Files]
-Source: "dist\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "dist\合同批量生成器\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "README_windows.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "sample_data.xlsx"; DestDir: "{app}"; Flags: ignoreversion
 Source: "contract_template.docx"; DestDir: "{app}"; Flags: ignoreversion

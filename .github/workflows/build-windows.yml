@@ -46,7 +46,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path release | Out-Null
-          Copy-Item "dist\合同批量生成器.exe" "release\合同批量生成器.exe"
+          Copy-Item "dist\合同批量生成器\*" "release" -Recurse
           if (Test-Path "README_windows.md") {
             Copy-Item "README_windows.md" "release\README_windows.md"
           }
@@ -62,7 +62,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: contract-generator-exe
-          path: dist/合同批量生成器.exe
+          path: dist/合同批量生成器/合同批量生成器.exe
 
       - name: Upload zip artifact
         uses: actions/upload-artifact@v4

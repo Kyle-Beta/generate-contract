@@ -60,7 +60,7 @@ jobs:
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path release | Out-Null
-          Copy-Item "dist\合同批量生成器.exe" "release\合同批量生成器.exe"
+          Copy-Item "dist\合同批量生成器\*" "release" -Recurse
           if (Test-Path "README_windows.md") {
             Copy-Item "README_windows.md" "release\README_windows.md"
           }
@@ -75,7 +75,7 @@ jobs:
       - name: Prepare release assets
         shell: pwsh
         run: |
-          Copy-Item "dist\合同批量生成器.exe" "dist\contract-generator.exe" -Force
+          Copy-Item "dist\合同批量生成器\合同批量生成器.exe" "dist\contract-generator.exe" -Force
           Copy-Item "dist\合同批量生成器_windows.zip" "dist\contract-generator-windows.zip" -Force
           Copy-Item "dist\合同批量生成器_Setup.exe" "dist\contract-generator-setup.exe" -Force
 
