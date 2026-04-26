@@ -419,7 +419,13 @@ def pick_output_dir(e=None):
 
 def _on_field_change(e: ft.ControlEvent):
     c = _get_ctx()
-    c.state.filename_field = e.control.value or "合同名称"
+    value = ""
+    control = getattr(e, "control", None)
+    if control is not None:
+        value = getattr(control, "value", "") or ""
+    if not value:
+        value = getattr(e, "data", "") or ""
+    c.state.filename_field = value or "合同名称"
     _refresh_ui()
 
 
@@ -662,6 +668,8 @@ def build_config_card(page):
         expand=True,
     )
     c.refs.field_dropdown.on_change = _on_field_change
+    if hasattr(c.refs.field_dropdown, "on_select"):
+        c.refs.field_dropdown.on_select = _on_field_change
     c.refs.start_button = ft.FilledButton(
         "开始生成",
         on_click=start_generate,
