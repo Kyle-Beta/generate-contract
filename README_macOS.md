@@ -4,14 +4,16 @@
 
 ## 构建产物
 
-macOS 构建会生成：
+macOS 构建现在会区分两种架构：
+
+- Intel Mac: `contract-generator-macos-intel.zip`
+- Apple Silicon Mac: `contract-generator-macos-apple-silicon.zip`
+
+其中 Release 和 Actions 下载时建议直接使用对应 zip 包。
+
+本地打包时仍会先生成：
 
 - `合同批量生成器.app`
-- `contract-generator-macos.zip`
-
-其中 Release 和 Actions 下载时建议直接使用：
-
-- `contract-generator-macos.zip`
 
 ## 本地打包
 
@@ -20,7 +22,19 @@ macOS 构建会生成：
 ```bash
 python3 -m pip install -r requirements.txt pyinstaller
 pyinstaller generate_contracts_macos.spec --noconfirm
-ditto -c -k --sequesterRsrc --keepParent "dist/合同批量生成器.app" "dist/contract-generator-macos.zip"
+ditto -c -k --sequesterRsrc --keepParent "dist/合同批量生成器.app" "dist/contract-generator-macos-intel.zip"
+```
+
+如果要指定 Intel 架构：
+
+```bash
+MACOS_TARGET_ARCH=x86_64 pyinstaller generate_contracts_macos.spec --noconfirm
+```
+
+如果要指定 Apple Silicon 架构：
+
+```bash
+MACOS_TARGET_ARCH=arm64 pyinstaller generate_contracts_macos.spec --noconfirm
 ```
 
 ## GitHub Actions
@@ -33,14 +47,17 @@ ditto -c -k --sequesterRsrc --keepParent "dist/合同批量生成器.app" "dist/
 
 会上传两个 Artifact：
 
-- `contract-generator-macos-app`
-- `contract-generator-macos-zip`
+- `contract-generator-macos-app-x64`
+- `contract-generator-macos-zip-x64`
+- `contract-generator-macos-app-arm64`
+- `contract-generator-macos-zip-arm64`
 
 ## GitHub Release
 
 推送版本 tag 后，Release 工作流会额外附带：
 
-- `contract-generator-macos.zip`
+- `contract-generator-macos-intel.zip`
+- `contract-generator-macos-apple-silicon.zip`
 
 ## 图标
 

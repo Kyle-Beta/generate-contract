@@ -229,6 +229,7 @@ def generate_contracts(
     template_path: str,
     output_dir: str = "output_contracts",
     name_field: str | None = None,
+    progress_callback=None,
 ) -> dict:
     """
     批量生成合同并返回结果摘要。
@@ -259,13 +260,44 @@ def generate_contracts(
         output_path = make_output_filename(record, name_field, i, output_dir)
         output_path = _dedupe_output_path(output_path, used_paths)
         used_paths.add(output_path)
+        if progress_callback:
+            progress_callback(
+                {
+                    "stage": "processing",
+                    "index": i,
+                    "total": len(records),
+                    "output_path": output_path,
+                    "record": record,
+                }
+            )
         try:
             fill_template(template_path, record, output_path)
             generated_files.append(output_path)
             success += 1
+            if progress_callback:
+                progress_callback(
+                    {
+                        "stage": "success",
+                        "index": i,
+                        "total": len(records),
+                        "output_path": output_path,
+                        "record": record,
+                    }
+                )
         except Exception as e:
             errors.append(f"[{i:03d}] {e}")
             failed += 1
+            if progress_callback:
+                progress_callback(
+                    {
+                        "stage": "error",
+                        "index": i,
+                        "total": len(records),
+                        "output_path": output_path,
+                        "record": record,
+                        "error": str(e),
+                    }
+                )
 
     return {
         "records": len(records),

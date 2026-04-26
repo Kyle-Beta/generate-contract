@@ -10,7 +10,19 @@ on:
 
 jobs:
   build-macos:
-    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-13
+            arch: x64
+            pyinstaller_arch: x86_64
+            zip_name: contract-generator-macos-intel.zip
+          - runner: macos-14
+            arch: arm64
+            pyinstaller_arch: arm64
+            zip_name: contract-generator-macos-apple-silicon.zip
+    runs-on: ${{ matrix.runner }}
 
     steps:
       - name: Checkout
@@ -28,20 +40,21 @@ jobs:
 
       - name: Build app bundle
         run: |
+          export MACOS_TARGET_ARCH='${{ matrix.pyinstaller_arch }}'
           pyinstaller generate_contracts_macos.spec --noconfirm
 
       - name: Package app
         run: |
-          ditto -c -k --sequesterRsrc --keepParent "dist/合同批量生成器.app" "dist/contract-generator-macos.zip"
+          ditto -c -k --sequesterRsrc --keepParent "dist/合同批量生成器.app" "dist/${{ matrix.zip_name }}"
 
       - name: Upload app artifact
         uses: actions/upload-artifact@v4
         with:
-          name: contract-generator-macos-app
+          name: contract-generator-macos-app-${{ matrix.arch }}
           path: dist/合同批量生成器.app
 
       - name: Upload zip artifact
         uses: actions/upload-artifact@v4
         with:
-          name: contract-generator-macos-zip
-          path: dist/contract-generator-macos.zip
+          name: contract-generator-macos-zip-${{ matrix.arch }}
+          path: dist/${{ matrix.zip_name }}

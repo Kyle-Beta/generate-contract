@@ -8,9 +8,10 @@
 2. 选择 Excel 数据源文件
 3. 选择 Word 模板文件
 4. 选择输出目录
-5. 如需按某一列命名文件，在“文件名字段”中填写对应列名
-6. 点击“读取字段”可查看 Excel 中可用占位符
-7. 点击“开始生成”
+5. 选择或确认自动识别出来的“文件名字段”
+6. 查看左侧字段预览和上方记录数摘要
+7. 点击“开始生成”，右侧可实时查看生成日志和进度
+8. 生成完成后可直接点击“打开输出目录”
 
 ## Excel 要求
 
@@ -153,4 +154,5 @@ VERSION
 - `contract-generator.exe`
 - `contract-generator-windows.zip`
 - `contract-generator-setup.exe`
-- `contract-generator-macos.zip`
+- `contract-generator-macos-intel.zip`
+- `contract-generator-macos-apple-silicon.zip`

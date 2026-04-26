@@ -1,10 +1,12 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+import os
 from pathlib import Path
 
 project_dir = Path.cwd()
 icon_file = project_dir / "app.icns"
 bundle_version = (project_dir / "VERSION").read_text(encoding="utf-8").strip()
+target_arch = os.environ.get("MACOS_TARGET_ARCH") or None
 
 a = Analysis(
     ['generate_contracts_gui.py'],
@@ -35,7 +37,7 @@ exe = EXE(
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
-    target_arch=None,
+    target_arch=target_arch,
     codesign_identity=None,
     entitlements_file=None,
 )
