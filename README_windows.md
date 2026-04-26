@@ -144,6 +144,6 @@ VERSION
 
 执行后会自动创建 GitHub Release，并附带以下文件：
 
-- `合同批量生成器.exe`
-- `合同批量生成器_windows.zip`
-- `合同批量生成器_Setup.exe`
+- `contract-generator.exe`
+- `contract-generator-windows.zip`
+- `contract-generator-setup.exe`

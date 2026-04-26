@@ -82,9 +82,9 @@ git push origin v1.1.0
 
 Release 成功后，到 GitHub 仓库的 Releases 页面确认以下文件都已附带：
 
-- `合同批量生成器.exe`
-- `合同批量生成器_windows.zip`
-- `合同批量生成器_Setup.exe`
+- `contract-generator.exe`
+- `contract-generator-windows.zip`
+- `contract-generator-setup.exe`
 
 ## 7. 对外分发建议
 

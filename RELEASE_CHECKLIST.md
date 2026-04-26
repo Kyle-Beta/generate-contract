@@ -39,6 +39,6 @@
 - 推送 tag，例如 `v1.1.0`
 - 检查 GitHub Actions 中 `build-windows.yml` 和 `release.yml` 是否执行成功
 - 检查 GitHub Release 页面是否附带以下文件：
-- `合同批量生成器.exe`
-- `合同批量生成器_windows.zip`
-- `合同批量生成器_Setup.exe`
+- `contract-generator.exe`
+- `contract-generator-windows.zip`
+- `contract-generator-setup.exe`
