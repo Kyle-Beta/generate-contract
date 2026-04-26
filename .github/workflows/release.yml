@@ -89,3 +89,52 @@ jobs:
             dist/contract-generator.exe
             dist/contract-generator-windows.zip
             dist/contract-generator-setup.exe
+
+  release-macos:
+    runs-on: macos-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Resolve version
+        id: version
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            version="${GITHUB_REF_NAME#v}"
+            tag="$GITHUB_REF_NAME"
+          else
+            version="$(cat VERSION)"
+            tag="v$version"
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller
+
+      - name: Build app bundle
+        run: |
+          pyinstaller generate_contracts_macos.spec --noconfirm
+
+      - name: Package app
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent "dist/合同批量生成器.app" "dist/contract-generator-macos.zip"
+
+      - name: Upload macOS asset to Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: 合同批量生成器 ${{ steps.version.outputs.version }}
+          files: |
+            dist/contract-generator-macos.zip

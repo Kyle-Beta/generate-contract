@@ -72,6 +72,12 @@ dist\合同批量生成器_Setup.exe
 .github/workflows/build-windows.yml
 ```
 
+macOS 对应工作流：
+
+```text
+.github/workflows/build-macos.yml
+```
+
 触发方式：
 
 - 推送到 `main` 或 `master`
@@ -147,3 +153,4 @@ VERSION
 - `contract-generator.exe`
 - `contract-generator-windows.zip`
 - `contract-generator-setup.exe`
+- `contract-generator-macos.zip`

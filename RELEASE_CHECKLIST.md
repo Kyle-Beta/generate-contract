@@ -26,6 +26,9 @@
 - 如需安装包，运行 `ISCC.exe installer.iss`
 - 确认生成 `dist\合同批量生成器_Setup.exe`
 - 双击安装版并验证桌面快捷方式、启动和卸载流程
+- 在 macOS 上运行 `pyinstaller generate_contracts_macos.spec --noconfirm`
+- 确认生成 `dist/合同批量生成器.app`
+- 确认生成 `dist/contract-generator-macos.zip`
 
 ## 仓库检查
 
@@ -42,3 +45,4 @@
 - `contract-generator.exe`
 - `contract-generator-windows.zip`
 - `contract-generator-setup.exe`
+- `contract-generator-macos.zip`

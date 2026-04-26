@@ -47,17 +47,20 @@ git branch -M main
 git push -u origin main
 ```
 
-## 4. 触发 Windows 自动构建
+## 4. 触发自动构建
 
 代码推送到 `main` 后，GitHub Actions 会自动运行：
 
 - [build-windows.yml](/Users/huangkai/Desktop/generate_contracts_tool/.github/workflows/build-windows.yml:1)
+- [build-macos.yml](/Users/huangkai/Desktop/generate_contracts_tool/.github/workflows/build-macos.yml:1)
 
 检查 Actions 页面，确认它成功生成：
 
 - `contract-generator-exe`
 - `contract-generator-windows-package`
 - `contract-generator-installer`
+- `contract-generator-macos-app`
+- `contract-generator-macos-zip`
 
 ## 5. 发布正式版本
 
@@ -85,6 +88,7 @@ Release 成功后，到 GitHub 仓库的 Releases 页面确认以下文件都已
 - `contract-generator.exe`
 - `contract-generator-windows.zip`
 - `contract-generator-setup.exe`
+- `contract-generator-macos.zip`
 
 ## 7. 对外分发建议
 
@@ -99,6 +103,10 @@ Release 成功后，到 GitHub 仓库的 Releases 页面确认以下文件都已
 给需要示例文件的用户提供：
 
 - `合同批量生成器_windows.zip`
+
+给 mac 用户提供：
+
+- `contract-generator-macos.zip`
 
 ## 8. 后续发版规则
 

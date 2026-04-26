@@ -1,0 +1,47 @@
+name: Build macOS App
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller
+
+      - name: Build app bundle
+        run: |
+          pyinstaller generate_contracts_macos.spec --noconfirm
+
+      - name: Package app
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent "dist/合同批量生成器.app" "dist/contract-generator-macos.zip"
+
+      - name: Upload app artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-generator-macos-app
+          path: dist/合同批量生成器.app
+
+      - name: Upload zip artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: contract-generator-macos-zip
+          path: dist/contract-generator-macos.zip
