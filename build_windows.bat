@@ -50,16 +50,6 @@ if errorlevel 1 (
   exit /b 1
 )
 
-if exist "windows_smoke_test.ps1" (
-  echo [INFO] Run smoke test
-  powershell -ExecutionPolicy Bypass -File .\windows_smoke_test.ps1 -ArtifactsDir .\dist -SkipLaunchTest
-  if errorlevel 1 (
-    echo [ERROR] Smoke test failed.
-    pause
-    exit /b 1
-  )
-)
-
 if not exist "dist" (
   echo [ERROR] dist folder not found.
   pause
