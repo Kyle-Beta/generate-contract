@@ -89,8 +89,13 @@ try {
     }
     Write-Host "文件存在检查通过。"
 
+    $filesToReport = @($exePath, $zipPath)
+    if ($CheckSetup) {
+        $filesToReport += $setupPath
+    }
+
     Write-Step "输出文件大小"
-    foreach ($file in @($exePath, $zipPath, $setupPath)) {
+    foreach ($file in $filesToReport) {
         $item = Get-Item -LiteralPath $file
         Write-Host ("{0} : {1:N2} MB" -f $item.Name, ($item.Length / 1MB))
     }
@@ -98,7 +103,9 @@ try {
     Write-Step "输出 SHA256"
     Print-Hash -Path $exePath -Label "EXE"
     Print-Hash -Path $zipPath -Label "ZIP"
-    Print-Hash -Path $setupPath -Label "SETUP"
+    if ($CheckSetup) {
+        Print-Hash -Path $setupPath -Label "SETUP"
+    }
 
     Write-Step "检查 ZIP 内容"
     Test-ZipContent -ZipPath $zipPath
