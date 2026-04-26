@@ -1,7 +1,7 @@
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(1, 1, 15, 0),
-    prodvers=(1, 1, 15, 0),
+    filevers=(1, 1, 16, 0),
+    prodvers=(1, 1, 16, 0),
     mask=0x3F,
     flags=0x0,
     OS=0x40004,
@@ -16,12 +16,12 @@ VSVersionInfo(
           '080404B0',
           [
             StringStruct('CompanyName', 'KaiHuang'),
-            StringStruct('FileDescription', '合同批量生成器'),
-            StringStruct('FileVersion', '1.1.15.0'),
+            StringStruct('FileDescription', 'Contract Generator'),
+            StringStruct('FileVersion', '1.1.16.0'),
             StringStruct('InternalName', 'contract-generator'),
-            StringStruct('OriginalFilename', '合同批量生成器.exe'),
-            StringStruct('ProductName', '合同批量生成器'),
-            StringStruct('ProductVersion', '1.1.15.0'),
+            StringStruct('OriginalFilename', 'contract-generator.exe'),
+            StringStruct('ProductName', 'Contract Generator'),
+            StringStruct('ProductVersion', '1.1.16.0'),
           ]
         )
       ]

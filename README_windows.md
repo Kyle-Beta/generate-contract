@@ -1,10 +1,10 @@
-# 合同批量生成器
+# Contract Generator
 
 这是一个面向 Windows 的桌面应用，用于根据 Excel 数据源和 Word 模板批量生成合同文件。
 
 ## 使用方式
 
-1. 解压后双击打开 `合同批量生成器\合同批量生成器.exe`
+1. 解压后双击打开 `contract-generator\contract-generator.exe`
 2. 选择 Excel 数据源文件
 3. 选择 Word 模板文件
 4. 选择输出目录
@@ -49,7 +49,7 @@ build_windows.bat
 打包成功后会生成目录版：
 
 ```text
-dist\合同批量生成器\
+dist\contract-generator\
 ```
 
 如果你安装了 Inno Setup，也可以进一步生成安装包：
@@ -61,7 +61,7 @@ dist\合同批量生成器\
 建议把整个目录压缩后分发；安装包输出为：
 
 ```text
-dist\合同批量生成器_Setup.exe
+dist\contract-generator-setup.exe
 ```
 
 ## GitHub Actions 自动打包
@@ -92,7 +92,7 @@ macOS 对应工作流：
 
 其中压缩包里默认包含：
 
-- `合同批量生成器.exe`
+- `contract-generator.exe`
 - 运行所需依赖文件
 - `README_windows.md`
 - `sample_data.xlsx`
@@ -100,7 +100,7 @@ macOS 对应工作流：
 
 安装版 Artifact 对应：
 
-- `合同批量生成器_Setup.exe`
+- `contract-generator-setup.exe`
 
 它会把程序安装到 `Program Files`，并可选创建桌面快捷方式。
 
@@ -146,7 +146,7 @@ VERSION
 
 触发方式：
 
-- 推送 tag，例如 `v1.1.15`
+- 推送 tag，例如 `v1.1.16`
 - 在 GitHub Actions 页面手动运行
 
 执行后会自动创建 GitHub Release，并附带以下文件：

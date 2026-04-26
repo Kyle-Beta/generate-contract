@@ -1,10 +1,10 @@
-#define MyAppName "合同批量生成器"
-#define MyAppVersion "1.1.15"
+#define MyAppName "Contract Generator"
+#define MyAppVersion "1.1.16"
 #define MyAppPublisher "KaiHuang"
-#define MyAppExeName "合同批量生成器.exe"
+#define MyAppExeName "contract-generator.exe"
 
 [Setup]
-AppId={{8C7C0A1E-5D79-4C89-9B4D-3FBC5C31F31A}
+AppId={{8C7C0A1E-5D79-4C89-9B4D-3FBC5C31F31A}}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
@@ -16,7 +16,7 @@ DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 PrivilegesRequired=lowest
 OutputDir=dist
-OutputBaseFilename=合同批量生成器_Setup
+OutputBaseFilename=contract-generator-setup
 SetupIconFile=app.ico
 Compression=lzma
 SolidCompression=yes
@@ -32,7 +32,7 @@ Name: "chinesesimp"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "创建桌面快捷方式"; GroupDescription: "附加任务:"; Flags: unchecked
 
 [Files]
-Source: "dist\合同批量生成器\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "dist\contract-generator\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "README_windows.md"; DestDir: "{app}"; Flags: ignoreversion
 Source: "sample_data.xlsx"; DestDir: "{app}"; Flags: ignoreversion
 Source: "contract_template.docx"; DestDir: "{app}"; Flags: ignoreversion

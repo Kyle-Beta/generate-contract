@@ -39,7 +39,7 @@ function Test-ZipContent {
     try {
         Expand-Archive -LiteralPath $ZipPath -DestinationPath $tmp -Force
         $required = @(
-            "合同批量生成器.exe",
+            "contract-generator.exe",
             "README_windows.md",
             "sample_data.xlsx",
             "contract_template.docx"
