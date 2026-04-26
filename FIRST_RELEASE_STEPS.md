@@ -67,14 +67,14 @@ git push -u origin main
 确认 [VERSION](/Users/huangkai/Desktop/generate_contracts_tool/VERSION:1) 中的版本号，例如：
 
 ```text
-1.1.10
+1.1.11
 ```
 
 然后在本地打 tag 并推送：
 
 ```bash
-git tag v1.1.10
-git push origin v1.1.10
+git tag v1.1.11
+git push origin v1.1.11
 ```
 
 这会触发：
@@ -116,5 +116,5 @@ Release 成功后，到 GitHub 仓库的 Releases 页面确认以下文件都已
 2. 更新 `version_info.txt`
 3. 更新 `installer.iss`
 4. 提交代码并推送 `main`
-5. 创建新 tag，例如 `v1.1.10`
+5. 创建新 tag，例如 `v1.1.11`
 6. 等待 GitHub Release 自动完成

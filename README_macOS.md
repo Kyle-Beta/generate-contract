@@ -61,10 +61,10 @@ MACOS_TARGET_ARCH=arm64 pyinstaller generate_contracts_macos.spec --noconfirm
 
 ## 图标
 
-如果你希望 macOS `.app` 使用专用图标，请在项目根目录放置：
+macOS 构建会自动使用项目根目录的：
 
 ```text
-app.icns
+app.ico
 ```
 
-如果没有该文件，构建仍可进行，只是不带专用 macOS 图标。
+工作流会在构建前自动把 `app.ico` 转成临时 `app.icns`，不需要再单独维护一份 macOS 图标文件。

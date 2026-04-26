@@ -17,11 +17,11 @@ VSVersionInfo(
           [
             StringStruct('CompanyName', 'KaiHuang'),
             StringStruct('FileDescription', '合同批量生成器'),
-            StringStruct('FileVersion', '1.1.10.0'),
+            StringStruct('FileVersion', '1.1.11.0'),
             StringStruct('InternalName', 'contract-generator'),
             StringStruct('OriginalFilename', '合同批量生成器.exe'),
             StringStruct('ProductName', '合同批量生成器'),
-            StringStruct('ProductVersion', '1.1.10.0'),
+            StringStruct('ProductVersion', '1.1.11.0'),
           ]
         )
       ]

@@ -32,6 +32,11 @@ jobs:
         run: |
           pyinstaller generate_contracts.spec --noconfirm
 
+      - name: Smoke test build output
+        shell: pwsh
+        run: |
+          powershell -ExecutionPolicy Bypass -File .\windows_smoke_test.ps1 -ArtifactsDir .\dist -SkipLaunchTest
+
       - name: Install Inno Setup
         shell: pwsh
         run: |

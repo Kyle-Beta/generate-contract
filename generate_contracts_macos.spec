@@ -2,20 +2,21 @@
 
 import os
 from pathlib import Path
-from PyInstaller.utils.hooks import collect_all
+from PyInstaller.utils.hooks import collect_all, collect_data_files
 
 project_dir = Path.cwd()
-icon_file = project_dir / "app.icns"
+icon_file = Path(os.environ.get("MACOS_ICON_FILE") or (project_dir / "build" / "app.icns"))
 bundle_version = (project_dir / "VERSION").read_text(encoding="utf-8").strip()
 target_arch = os.environ.get("MACOS_TARGET_ARCH") or None
 flet_datas, flet_binaries, flet_hiddenimports = collect_all("flet")
 desktop_datas, desktop_binaries, desktop_hiddenimports = collect_all("flet_desktop")
+docx_datas = collect_data_files("docx")
 
 a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=flet_binaries + desktop_binaries,
-    datas=flet_datas + desktop_datas,
+    datas=flet_datas + desktop_datas + docx_datas,
     hiddenimports=flet_hiddenimports + desktop_hiddenimports,
     hookspath=[],
     hooksconfig={},
@@ -29,9 +30,8 @@ pyz = PYZ(a.pure)
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.datas,
     [],
+    exclude_binaries=True,
     name='合同批量生成器',
     debug=False,
     bootloader_ignore_signals=False,
@@ -45,8 +45,19 @@ exe = EXE(
     entitlements_file=None,
 )
 
-app = BUNDLE(
+coll = COLLECT(
     exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=False,
+    upx_exclude=[],
+    name='合同批量生成器',
+)
+
+app = BUNDLE(
+    coll,
     name='合同批量生成器.app',
     icon=str(icon_file) if icon_file.exists() else None,
     bundle_identifier='com.kylebeta.contract-generator',

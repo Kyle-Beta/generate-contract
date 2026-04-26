@@ -73,8 +73,80 @@ def _replace_in_section(section_part, mapping: dict):
         _replace_in_table(table, mapping)
 
 
+def _safe_replace_section(section, attr: str, mapping: dict):
+    """
+    安全替换页眉/页脚占位符。
+
+    在冻结打包环境中，访问缺省 header/footer 可能触发 python-docx
+    去加载内置模板文件；若该文件缺失则会抛 FileNotFoundError。
+    这里降级为跳过该部分，避免整份合同生成失败。
+    """
+    try:
+        section_part = getattr(section, attr)
+    except FileNotFoundError:
+        return
+    _replace_in_section(section_part, mapping)
+
+
+def _header_footer_templates_available() -> bool:
+    """
+    检查 python-docx 页眉页脚默认模板是否可用。
+
+    在某些 PyInstaller 产物中，docx/templates 可能缺失，
+    访问 section.header/footer 会触发 FileNotFoundError。
+    """
+    try:
+        import docx.parts.hdrftr as hdrftr
+
+        template_dir = Path(hdrftr.__file__).resolve().parent.parent / "templates"
+        required = ("default-header.xml", "default-footer.xml")
+        return all((template_dir / name).exists() for name in required)
+    except Exception:
+        return False
+
+
+def _ensure_docx_header_footer_templates() -> None:
+    """
+    运行时兜底：若 python-docx 默认 header/footer 模板缺失，则补一个最小模板。
+
+    某些打包环境会丢失 docx/templates/default-header.xml 或 default-footer.xml，
+    访问 section.header/footer 时会直接抛 FileNotFoundError。
+    """
+    try:
+        import docx.parts.hdrftr as hdrftr
+    except Exception:
+        return
+
+    template_dir = Path(hdrftr.__file__).resolve().parent.parent / "templates"
+    template_dir.mkdir(parents=True, exist_ok=True)
+
+    default_header = template_dir / "default-header.xml"
+    default_footer = template_dir / "default-footer.xml"
+
+    if not default_header.exists():
+        default_header.write_text(
+            (
+                '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+                '<w:hdr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+                "<w:p/></w:hdr>\n"
+            ),
+            encoding="utf-8",
+        )
+
+    if not default_footer.exists():
+        default_footer.write_text(
+            (
+                '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n'
+                '<w:ftr xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">'
+                "<w:p/></w:ftr>\n"
+            ),
+            encoding="utf-8",
+        )
+
+
 def fill_template(template_path: str, mapping: dict, output_path: str):
     """根据 mapping 填充模板，保存到 output_path"""
+    _ensure_docx_header_footer_templates()
     doc = Document(template_path)
 
     # 正文段落
@@ -85,14 +157,15 @@ def fill_template(template_path: str, mapping: dict, output_path: str):
     for table in doc.tables:
         _replace_in_table(table, mapping)
 
-    # 页眉页脚
-    for section in doc.sections:
-        _replace_in_section(section.header, mapping)
-        _replace_in_section(section.footer, mapping)
-        _replace_in_section(section.even_page_header, mapping)
-        _replace_in_section(section.even_page_footer, mapping)
-        _replace_in_section(section.first_page_header, mapping)
-        _replace_in_section(section.first_page_footer, mapping)
+    # 页眉页脚（模板资源缺失时降级跳过，避免整份合同失败）
+    if _header_footer_templates_available():
+        for section in doc.sections:
+            _safe_replace_section(section, "header", mapping)
+            _safe_replace_section(section, "footer", mapping)
+            _safe_replace_section(section, "even_page_header", mapping)
+            _safe_replace_section(section, "even_page_footer", mapping)
+            _safe_replace_section(section, "first_page_header", mapping)
+            _safe_replace_section(section, "first_page_footer", mapping)
 
     doc.save(output_path)
 

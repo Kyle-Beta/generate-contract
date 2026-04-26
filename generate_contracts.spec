@@ -1,27 +1,25 @@
 # -*- mode: python ; coding: utf-8 -*-
 
 from pathlib import Path
-from PyInstaller.utils.hooks import collect_data_files
+from PyInstaller.utils.hooks import collect_all, collect_data_files
 
 project_dir = Path.cwd()
 icon_file = project_dir / "app.ico"
 version_file = project_dir / "version_info.txt"
 desktop_datas = collect_data_files("flet_desktop")
+flet_datas, flet_binaries, flet_hiddenimports = collect_all("flet")
+docx_datas = collect_data_files("docx")
 
 a = Analysis(
     ["main.py"],
     pathex=[],
-    binaries=[],
-    datas=desktop_datas,
-    hiddenimports=[],
+    binaries=flet_binaries,
+    datas=desktop_datas + flet_datas + docx_datas,
+    hiddenimports=flet_hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],
-    excludes=[
-        "flet.fastapi",
-        "flet.pyodide_connection",
-        "flet.security",
-    ],
+    excludes=[],
     noarchive=False,
     optimize=2,
 )

@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
-import asyncio
+import datetime
 import os
 import subprocess
 import sys
+import traceback
+import tkinter as tk
+from tkinter import filedialog
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
 import flet as ft
+from generate_contracts import generate_contracts, list_excel_fields
 
 
 BG_COLOR = "#F5F7FB"
@@ -86,6 +90,26 @@ def _is_windows() -> bool:
     return os.name == "nt"
 
 
+def _align_center():
+    align_mod = getattr(ft, "alignment", None)
+    if align_mod is not None and hasattr(align_mod, "center"):
+        return align_mod.center
+    alignment_cls = getattr(ft, "Alignment", None)
+    if alignment_cls is not None:
+        return alignment_cls(0, 0)
+    return None
+
+
+def _align_center_right():
+    align_mod = getattr(ft, "alignment", None)
+    if align_mod is not None and hasattr(align_mod, "center_right"):
+        return align_mod.center_right
+    alignment_cls = getattr(ft, "Alignment", None)
+    if alignment_cls is not None:
+        return alignment_cls(1, 0)
+    return None
+
+
 def _display_name(path_value: str, placeholder: str) -> str:
     if not path_value:
         return placeholder
@@ -96,6 +120,36 @@ def _display_name(path_value: str, placeholder: str) -> str:
 def _append_log(status: str, file_name: str, message: str):
     c = _get_ctx()
     c.state.logs.append({"status": status, "file_name": file_name, "message": message})
+
+
+def _app_log_dir() -> Path:
+    if _is_windows():
+        base = Path(os.environ.get("LOCALAPPDATA") or Path.home())
+    elif _is_macos():
+        base = Path.home() / "Library" / "Logs"
+    else:
+        base = Path.home() / ".local" / "state"
+    path = base / "contract_generator"
+    path.mkdir(parents=True, exist_ok=True)
+    return path
+
+
+def _write_error_log(action: str, exc: Exception, context: dict[str, Any] | None = None) -> Path:
+    ts = datetime.datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+    log_path = _app_log_dir() / f"error_{action}_{ts}.log"
+    tb = traceback.format_exc()
+    lines = [
+        f"time: {datetime.datetime.now().isoformat()}",
+        f"action: {action}",
+        f"platform: {sys.platform}",
+        f"exception: {type(exc).__name__}: {exc}",
+        f"context: {context or {}}",
+        "",
+        "traceback:",
+        tb,
+    ]
+    log_path.write_text("\n".join(lines), encoding="utf-8")
+    return log_path
 
 
 def _pick_file_macos(prompt: str) -> str:
@@ -130,6 +184,26 @@ def _pick_folder_macos(prompt: str) -> str:
         check=False,
     )
     return result.stdout.strip()
+
+
+def _pick_file_windows(prompt: str, filetypes: list[tuple[str, str]]) -> str:
+    root = tk.Tk()
+    root.withdraw()
+    root.attributes("-topmost", True)
+    try:
+        return filedialog.askopenfilename(title=prompt, filetypes=filetypes) or ""
+    finally:
+        root.destroy()
+
+
+def _pick_folder_windows(prompt: str) -> str:
+    root = tk.Tk()
+    root.withdraw()
+    root.attributes("-topmost", True)
+    try:
+        return filedialog.askdirectory(title=prompt) or ""
+    finally:
+        root.destroy()
 
 
 def _header_badge_info() -> tuple[str, str]:
@@ -219,7 +293,7 @@ def _section_title(title: str, subtitle: str | None = None, icon: ft.IconData | 
                 height=28,
                 border_radius=8,
                 bgcolor="#E0ECFF",
-                alignment=ft.alignment.center,
+                alignment=_align_center(),
                 content=ft.Icon(icon, size=16, color=PRIMARY),
             )
         )
@@ -240,8 +314,7 @@ def _on_excel_picked(e: ft.FilePickerResultEvent):
     if e.files:
         c = _get_ctx()
         c.state.selected_excel_path = e.files[0].path
-        c.state.filename_fields = ["合同名称", "甲方", "乙方", "合同编号", "签署日期", "联系电话", "地址", "金额"]
-        c.state.filename_field = "合同名称"
+        _load_fields_from_excel(c.state.selected_excel_path)
         _refresh_ui()
 
 
@@ -269,8 +342,21 @@ def pick_excel(e=None):
                 _refresh_ui()
                 return
             c.state.selected_excel_path = path
-            c.state.filename_fields = ["合同名称", "甲方", "乙方", "合同编号", "签署日期", "联系电话", "地址", "金额"]
-            c.state.filename_field = "合同名称"
+            _load_fields_from_excel(c.state.selected_excel_path)
+            _refresh_ui()
+            return
+    if _is_windows():
+        path = _pick_file_windows(
+            "选择 Excel 数据源",
+            [("Excel 文件", "*.xlsx *.xlsm *.xls"), ("所有文件", "*.*")],
+        )
+        if path:
+            if Path(path).suffix.lower() not in {".xlsx", ".xlsm", ".xls"}:
+                _append_log("error", Path(path).name, "文件类型不支持，请选择 Excel 文件")
+                _refresh_ui()
+                return
+            c.state.selected_excel_path = path
+            _load_fields_from_excel(c.state.selected_excel_path)
             _refresh_ui()
             return
     if c.excel_picker:
@@ -286,6 +372,16 @@ def pick_template(e=None):
     c = _get_ctx()
     if _is_macos():
         path = _pick_file_macos("选择 Word 模板")
+        if path:
+            if Path(path).suffix.lower() != ".docx":
+                _append_log("error", Path(path).name, "模板文件必须是 .docx")
+                _refresh_ui()
+                return
+            c.state.selected_template_path = path
+            _refresh_ui()
+            return
+    if _is_windows():
+        path = _pick_file_windows("选择 Word 模板", [("Word 文档", "*.docx"), ("所有文件", "*.*")])
         if path:
             if Path(path).suffix.lower() != ".docx":
                 _append_log("error", Path(path).name, "模板文件必须是 .docx")
@@ -311,6 +407,12 @@ def pick_output_dir(e=None):
             c.state.output_dir = path
             _refresh_ui()
             return
+    if _is_windows():
+        path = _pick_folder_windows("选择输出目录")
+        if path:
+            c.state.output_dir = path
+            _refresh_ui()
+            return
     if c.output_picker:
         c.output_picker.get_directory_path(dialog_title="选择输出目录")
 
@@ -319,6 +421,21 @@ def _on_field_change(e: ft.ControlEvent):
     c = _get_ctx()
     c.state.filename_field = e.control.value or "合同名称"
     _refresh_ui()
+
+
+def _load_fields_from_excel(excel_path: str) -> None:
+    c = _get_ctx()
+    try:
+        fields, record_count = list_excel_fields(excel_path)
+        c.state.filename_fields = fields if fields else ["合同名称"]
+        if c.state.filename_field not in c.state.filename_fields:
+            c.state.filename_field = c.state.filename_fields[0]
+        _append_log("success", Path(excel_path).name, f"已读取字段 {len(c.state.filename_fields)} 个，记录 {record_count} 条")
+    except Exception as exc:
+        c.state.filename_fields = ["合同名称"]
+        c.state.filename_field = "合同名称"
+        log_file = _write_error_log("load_fields", exc, {"excel_path": excel_path})
+        _append_log("error", Path(excel_path).name, f"读取字段失败：{exc}（日志：{log_file.name}）")
 
 
 async def start_generate(e=None):
@@ -332,24 +449,63 @@ async def start_generate(e=None):
         _refresh_ui()
         return
 
+    excel_path = Path(s.selected_excel_path)
+    template_path = Path(s.selected_template_path)
+    if not excel_path.exists():
+        _append_log("error", "参数检查", f"Excel 文件不存在：{excel_path}")
+        _refresh_ui()
+        return
+    if not template_path.exists():
+        _append_log("error", "参数检查", f"模板文件不存在：{template_path}")
+        _refresh_ui()
+        return
+
+    out_dir = _resolve_output_dir(s.output_dir)
+    s.output_dir = str(out_dir)
+
     s.is_generating = True
     s.success_count = 0
     s.fail_count = 0
-    s.total_count = 3
+    s.total_count = 0
     s.progress_value = 0
     s.logs = []
     _refresh_ui()
 
-    demo_files = ["合同_001.docx", "合同_002.docx", "合同_003.docx"]
-    for idx, file_name in enumerate(demo_files, start=1):
-        await asyncio.sleep(0.35)
-        s.success_count += 1
-        s.progress_value = idx / s.total_count
-        _append_log("success", file_name, "生成成功")
-        _refresh_ui()
+    try:
+        name_field = s.filename_field if s.filename_field in s.filename_fields else None
+        result = generate_contracts(
+            excel_path=str(excel_path),
+            template_path=str(template_path),
+            output_dir=str(out_dir),
+            name_field=name_field,
+        )
 
-    s.is_generating = False
-    _refresh_ui()
+        s.total_count = int(result.get("records", 0))
+        s.success_count = int(result.get("success", 0))
+        s.fail_count = int(result.get("failed", 0))
+        s.progress_value = 1.0 if s.total_count > 0 else 0.0
+
+        for file_path in result.get("generated_files", []):
+            _append_log("success", Path(file_path).name, "生成成功")
+        for error in result.get("errors", []):
+            _append_log("error", "生成失败", str(error))
+    except Exception as exc:
+        s.fail_count += 1
+        s.progress_value = 0
+        log_file = _write_error_log(
+            "generate",
+            exc,
+            {
+                "excel_path": s.selected_excel_path,
+                "template_path": s.selected_template_path,
+                "output_dir": s.output_dir,
+                "filename_field": s.filename_field,
+            },
+        )
+        _append_log("error", "生成失败", f"{exc}（日志：{log_file.name}）")
+    finally:
+        s.is_generating = False
+        _refresh_ui()
 
 
 def clear_logs(e=None):
@@ -405,7 +561,8 @@ def open_output_dir(e=None):
         _append_log("success", out_path.name, f"已打开目录：{out_path}")
         _refresh_ui()
     except Exception as exc:
-        _append_log("error", "输出目录", f"打开失败：{exc}")
+        log_file = _write_error_log("open_output_dir", exc, {"output_dir": out})
+        _append_log("error", "输出目录", f"打开失败：{exc}（日志：{log_file.name}）")
         _refresh_ui()
 
 
@@ -474,7 +631,7 @@ def build_header(page):
                 height=42,
                 border_radius=12,
                 bgcolor="#DBEAFE",
-                alignment=ft.alignment.center,
+                alignment=_align_center(),
                 content=ft.Icon(ft.Icons.DESCRIPTION_OUTLINED, color=PRIMARY, size=24),
             ),
             ft.Column(
@@ -694,13 +851,14 @@ def main(page: ft.Page):
 
     page.on_resized = on_window_resize
 
-    c.excel_picker = ft.FilePicker()
-    c.excel_picker.on_result = _on_excel_picked
-    c.template_picker = ft.FilePicker()
-    c.template_picker.on_result = _on_template_picked
-    c.output_picker = ft.FilePicker()
-    c.output_picker.on_result = _on_output_picked
-    page.overlay.extend([c.excel_picker, c.template_picker, c.output_picker])
+    if not _is_windows():
+        c.excel_picker = ft.FilePicker()
+        c.excel_picker.on_result = _on_excel_picked
+        c.template_picker = ft.FilePicker()
+        c.template_picker.on_result = _on_template_picked
+        c.output_picker = ft.FilePicker()
+        c.output_picker.on_result = _on_output_picked
+        page.overlay.extend([c.excel_picker, c.template_picker, c.output_picker])
 
     left = ft.Container(build_config_card(page), col={"xs": 12, "md": 4})
     right = ft.Container(
@@ -717,7 +875,7 @@ def main(page: ft.Page):
                 ft.ResponsiveRow([left, right], spacing=16, run_spacing=16),
                 ft.Container(
                     content=c.refs.window_width_text,
-                    alignment=ft.alignment.center_right,
+                    alignment=_align_center_right(),
                     padding=ft.padding.only(top=8),
                 ),
             ],
