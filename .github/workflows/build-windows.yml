@@ -47,6 +47,11 @@ jobs:
         run: |
           & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" "installer.iss"
 
+      - name: Smoke test installer output
+        shell: pwsh
+        run: |
+          powershell -ExecutionPolicy Bypass -File .\windows_smoke_test.ps1 -ArtifactsDir .\dist -SkipLaunchTest -CheckSetup
+
       - name: Prepare release package
         shell: pwsh
         run: |

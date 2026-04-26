@@ -7,7 +7,8 @@ param(
     [string]$ZipName = "contract-generator-windows.zip",
     [string]$SetupName = "contract-generator-setup.exe",
     [int]$LaunchWaitSeconds = 8,
-    [switch]$SkipLaunchTest
+    [switch]$SkipLaunchTest,
+    [switch]$CheckSetup
 )
 
 function Write-Step {
@@ -83,7 +84,9 @@ try {
     Write-Step "检查文件存在"
     Assert-File -Path $exePath -Label "EXE"
     Assert-File -Path $zipPath -Label "ZIP"
-    Assert-File -Path $setupPath -Label "SETUP"
+    if ($CheckSetup) {
+        Assert-File -Path $setupPath -Label "SETUP"
+    }
     Write-Host "文件存在检查通过。"
 
     Write-Step "输出文件大小"
@@ -110,6 +113,9 @@ try {
 
     Write-Step "结果"
     Write-Host "Windows 构建冒烟检查通过。" -ForegroundColor Green
+    if (-not $CheckSetup) {
+        Write-Host "未检查安装器文件；如需检查，请传入 -CheckSetup。"
+    }
     exit 0
 }
 catch {
