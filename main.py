@@ -363,6 +363,15 @@ def clear_logs(e=None):
     _refresh_ui()
 
 
+def _resolve_output_dir(path_value: str) -> Path:
+    path = Path(path_value).expanduser()
+    if not path.is_absolute():
+        path = (Path.cwd() / path).resolve()
+    else:
+        path = path.resolve()
+    return path
+
+
 def open_output_dir(e=None):
     c = _get_ctx()
     out = c.state.output_dir.strip()
@@ -371,13 +380,30 @@ def open_output_dir(e=None):
         _refresh_ui()
         return
     try:
-        Path(out).mkdir(parents=True, exist_ok=True)
+        out_path = _resolve_output_dir(out)
+        out_path.mkdir(parents=True, exist_ok=True)
         if _is_macos():
-            subprocess.run(["open", out], check=False)
+            result = subprocess.run(
+                ["open", str(out_path)],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            if result.returncode != 0:
+                raise RuntimeError((result.stderr or result.stdout or f"exit {result.returncode}").strip())
         elif _is_windows():
-            os.startfile(out)  # type: ignore[attr-defined]
+            os.startfile(str(out_path))  # type: ignore[attr-defined]
         else:
-            subprocess.run(["xdg-open", out], check=False)
+            result = subprocess.run(
+                ["xdg-open", str(out_path)],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            if result.returncode != 0:
+                raise RuntimeError((result.stderr or result.stdout or f"exit {result.returncode}").strip())
+        _append_log("success", out_path.name, f"已打开目录：{out_path}")
+        _refresh_ui()
     except Exception as exc:
         _append_log("error", "输出目录", f"打开失败：{exc}")
         _refresh_ui()
@@ -476,9 +502,9 @@ def build_config_card(page):
         fill_color=INPUT_BG,
         border_color=BORDER,
         border_radius=14,
-        on_change=_on_field_change,
         expand=True,
     )
+    c.refs.field_dropdown.on_change = _on_field_change
     c.refs.start_button = ft.FilledButton(
         "开始生成",
         on_click=start_generate,
