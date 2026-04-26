@@ -8,6 +8,7 @@ param(
     [string]$SetupName = "contract-generator-setup.exe",
     [int]$LaunchWaitSeconds = 8,
     [switch]$SkipLaunchTest,
+    [switch]$CheckZip,
     [switch]$CheckSetup
 )
 
@@ -83,13 +84,18 @@ try {
 
     Write-Step "检查文件存在"
     Assert-File -Path $exePath -Label "EXE"
-    Assert-File -Path $zipPath -Label "ZIP"
+    if ($CheckZip) {
+        Assert-File -Path $zipPath -Label "ZIP"
+    }
     if ($CheckSetup) {
         Assert-File -Path $setupPath -Label "SETUP"
     }
     Write-Host "文件存在检查通过。"
 
-    $filesToReport = @($exePath, $zipPath)
+    $filesToReport = @($exePath)
+    if ($CheckZip) {
+        $filesToReport += $zipPath
+    }
     if ($CheckSetup) {
         $filesToReport += $setupPath
     }
@@ -102,13 +108,17 @@ try {
 
     Write-Step "输出 SHA256"
     Print-Hash -Path $exePath -Label "EXE"
-    Print-Hash -Path $zipPath -Label "ZIP"
+    if ($CheckZip) {
+        Print-Hash -Path $zipPath -Label "ZIP"
+    }
     if ($CheckSetup) {
         Print-Hash -Path $setupPath -Label "SETUP"
     }
 
-    Write-Step "检查 ZIP 内容"
-    Test-ZipContent -ZipPath $zipPath
+    if ($CheckZip) {
+        Write-Step "检查 ZIP 内容"
+        Test-ZipContent -ZipPath $zipPath
+    }
 
     if (-not $SkipLaunchTest) {
         Write-Step "检查 EXE 可启动性"

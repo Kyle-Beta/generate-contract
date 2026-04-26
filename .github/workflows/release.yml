@@ -82,6 +82,11 @@ jobs:
           }
           Compress-Archive -Path "release\*" -DestinationPath "dist\合同批量生成器_windows.zip" -Force
 
+      - name: Smoke test release package
+        shell: pwsh
+        run: |
+          powershell -ExecutionPolicy Bypass -File .\windows_smoke_test.ps1 -ArtifactsDir .\dist -SkipLaunchTest -CheckZip -CheckSetup
+
       - name: Prepare release assets
         shell: pwsh
         run: |

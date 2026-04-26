@@ -39,7 +39,7 @@
 ## GitHub 发布
 
 - 提交代码并推送到仓库默认分支
-- 推送 tag，例如 `v1.1.14`
+- 推送 tag，例如 `v1.1.15`
 - 检查 GitHub Actions 中 `build-windows.yml` 和 `release.yml` 是否执行成功
 - 检查 GitHub Release 页面是否附带以下文件：
 - `contract-generator.exe`
